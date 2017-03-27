@@ -32,11 +32,38 @@ public class ValueIterationAgent extends PlanningValueAgent{
 	 * fonction de valeur des etats
 	 */
 	protected HashMap<Etat,Double> V;
+
+	private static class ActionValue{
+		List<Action> actions;
+		double value;
+
+		ActionValue(List<Action> actions, double value)
+		{
+			this.actions = actions;
+			this.value = value;
+		}
+
+		public List<Action> getActions() {
+			return actions;
+		}
+
+		public void setActions(List<Action> actions) {
+			this.actions = actions;
+		}
+
+		public double getValue() {
+			return value;
+		}
+
+		public void setValue(double value) {
+			this.value = value;
+		}
+	}
 	
 	/**
 	 * 
 	 * @param gamma
-	 * @param nbIterations
+//	 * @param nbIterations
 	 * @param mdp
 	 */
 	public ValueIterationAgent(double gamma,  MDP mdp) {
@@ -70,13 +97,34 @@ public class ValueIterationAgent extends PlanningValueAgent{
 		//lorsque l'on planifie jusqu'a convergence, on arrete les iterations lorsque
 		//delta < epsilon 
 		this.delta=0.0;
-		//*** VOTRE CODE
-		
-		
-		// mise a jour vmax et vmin pour affichage du gradient de couleur:
-		//vmax est la valeur  max de V  pour tout s
-		//vmin est la valeur min de V  pour tout s
-		// ...
+
+		HashMap<Etat, Double> vPrime = new HashMap<>();
+		double vMax = Double.MIN_VALUE;
+		double vMin = Double.MAX_VALUE;
+
+		for (Etat etat:this.mdp.getEtatsAccessibles()){
+			double bestActionValue = 0;
+			try {
+				ActionValue actionValue = this.getBestActionValue(etat);
+				if(actionValue != null)
+					bestActionValue = actionValue.getValue();
+			} catch (Exception e) {
+//				e.printStackTrace();
+			}
+
+			vPrime.put(etat, bestActionValue);
+			if(bestActionValue < vMin)
+				vMin = bestActionValue;
+			if(bestActionValue > vMax)
+				vMax = bestActionValue;
+			double localDelta = bestActionValue - V.get(etat);
+			if(localDelta > delta)
+				this.setDelta(localDelta);
+		}
+
+		this.V = vPrime;
+		this.vmax = vMax;
+		this.vmin = vMin;
 		
 		//******************* laisser la notification a la fin de la methode	
 		this.notifyObs();
@@ -108,14 +156,70 @@ public class ValueIterationAgent extends PlanningValueAgent{
 	 */
 	@Override
 	public List<Action> getPolitique(Etat _e) {
-		//*** VOTRE CODE
-		
 		// retourne action de meilleure valeur dans _e selon V, 
 		// retourne liste vide si aucune action legale (etat absorbant)
 		List<Action> returnactions = new ArrayList<Action>();
-	
+
+
+		if(!mdp.estAbsorbant(_e)) {
+			try {
+				ActionValue bestActionValue = this.getBestActionValue(_e);
+				if(bestActionValue != null)
+					returnactions.addAll(bestActionValue.getActions());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+		}
+
 		return returnactions;
 		
+	}
+
+	private ActionValue getBestActionValue(Etat _e) throws Exception {
+		double bestActionValue = Double.MIN_VALUE;
+		List<Action> bestActions = null;
+
+		for (Action actionPossible:this.mdp.getActionsPossibles(_e))
+		{
+			double actionValue = 0;
+
+			Map<Etat, Double> etatsTransition;
+			try {
+				etatsTransition = mdp.getEtatTransitionProba(_e, actionPossible);
+				for (Map.Entry<Etat, Double> entry : etatsTransition.entrySet())
+				{
+					Etat etatAccessible = entry.getKey();
+					double T = entry.getValue();
+					double R = mdp.getRecompense(_e, actionPossible, etatAccessible);
+					double Vlast = V.get(etatAccessible);
+
+					actionValue += T * ( R + gamma * Vlast );
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			if(actionValue > bestActionValue)
+			{
+				bestActionValue = actionValue;
+				bestActions = new ArrayList<>();
+				bestActions.add(actionPossible);
+			}
+
+			if(actionValue == bestActionValue)
+			{
+				if(bestActions == null)
+					bestActions = new ArrayList<>();
+				bestActions.add(actionPossible);
+			}
+		}
+
+		if(bestActions != null)
+			return new ActionValue(bestActions, bestActionValue);
+		else
+			throw new Exception("No action for this etat");
+
 	}
 	
 	@Override
