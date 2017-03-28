@@ -177,7 +177,7 @@ public class ValueIterationAgent extends PlanningValueAgent{
 	}
 
 	private ActionValue getBestActionValue(Etat _e) throws Exception {
-		double bestActionValue = Double.MIN_VALUE;
+		double bestActionValue = -Double.MAX_VALUE;
 		List<Action> bestActions = null;
 
 		for (Action actionPossible:this.mdp.getActionsPossibles(_e))
