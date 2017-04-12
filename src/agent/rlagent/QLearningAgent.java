@@ -34,9 +34,6 @@ public class QLearningAgent extends RLAgent {
 			Environnement _env) {
 		super(alpha, gamma,_env);
 		qvaleurs = new HashMap<Etat,HashMap<Action,Double>>();
-		
-		
-	
 	}
 
 
@@ -78,19 +75,28 @@ public class QLearningAgent extends RLAgent {
 	}
 	
 	@Override
-	public double getValeur(Etat e) {
-		double maxVal = 0;
-
+	public double getValeur(Etat e)
+    {
 		if(qvaleurs.containsKey(e)) {
-			for(Map.Entry<Action,Double> entry : qvaleurs.get(e).entrySet()) {
-				Action action = entry.getKey();
-				double value = entry.getValue();
 
-				maxVal = Math.max(maxVal, value);
-			}
+            Map<Action, Double> actions = qvaleurs.get(e);
+            if(actions.isEmpty())
+                return 0.0;
+            else {
+                double maxVal = -Double.MAX_VALUE;
+
+                for (Map.Entry<Action, Double> entry : actions.entrySet()){
+                    Action action = entry.getKey();
+                    double value = entry.getValue();
+
+                    maxVal = Math.max(maxVal, value);
+                }
+
+                return maxVal;
+            }
 		}
-
-		return maxVal;
+		else
+		    return 0.0;
 	}
 
 	@Override
@@ -100,6 +106,7 @@ public class QLearningAgent extends RLAgent {
 			if (actions.containsKey(a))
 				return actions.get(a);
 		}
+
 		return 0.0;
 	}
 	
@@ -143,8 +150,7 @@ public class QLearningAgent extends RLAgent {
 			System.out.println("QL mise a jour etat "+e+" action "+a+" etat' "+esuivant+ " r "+reward);
 
 		double newVal = ((1-alpha)*this.getQValeur(e, a))+(alpha*(reward+gamma*this.getValeur(esuivant)));
-		System.out.println(newVal);
-		this.setQValeur(e, a, newVal);
+        this.setQValeur(e, a, newVal);
 	}
 
 	@Override
