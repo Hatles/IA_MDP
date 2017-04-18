@@ -39,7 +39,7 @@ public class testRLPacman extends Application{
 	/** nombre d'experiences a lancer (pour faire une moyenne), une experience est un apprentissage sur plusieurs parties */
 	static int nbmean = 1;
 	/** nombre de parties ou l'agent apprend */
-	static int nbepisodelearn = 1000;
+	static int nbepisodelearn = 500;
 	/** nombre de partie ou l'agent exploite la politique apprise (epsilon=0) */
 	static int nbepisodegreedy = 30;
 	/** nombre de parties ou l'on affiche le jeu pacman pour voir le comportement appris  */

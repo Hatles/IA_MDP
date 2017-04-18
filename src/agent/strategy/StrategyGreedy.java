@@ -35,8 +35,7 @@ public class StrategyGreedy extends StrategyExploration{
 		if(rand.nextDouble() > epsilon)
 		{
 			List<Action> bestActions = this.agent.getPolitique(_e);
-//			if(bestActions.size() < 2 && actions.size() != bestActions.size())
-//				System.out.println("Strat greedy");
+
 			if(bestActions.isEmpty())
 				return null;
 			else
