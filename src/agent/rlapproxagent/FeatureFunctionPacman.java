@@ -43,7 +43,7 @@ public class FeatureFunctionPacman implements FeatureFunction{
 			return vfeatures;
 		}
 	
-		StateAgentPacman pacmanstate_next= stategamepacman.movePacmanSimu(0, new ActionPacman(a.ordinal()));
+		StateAgentPacman pacmanstate_next = stategamepacman.movePacmanSimu(0, new ActionPacman(a.ordinal()));
 		 
 		//*** VOTRE CODE
 		

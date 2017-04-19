@@ -87,7 +87,7 @@ public class QLearningAgent extends RLAgent {
 
                 for (Map.Entry<Action, Double> entry : actions.entrySet()){
                     Action action = entry.getKey();
-                    double value = entry.getValue();
+                    double value = getQValeur(e, action);
 
                     maxVal = Math.max(maxVal, value);
                 }

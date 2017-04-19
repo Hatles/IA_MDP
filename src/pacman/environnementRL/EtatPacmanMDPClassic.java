@@ -105,4 +105,12 @@ public class EtatPacmanMDPClassic implements Etat , Cloneable{
 	{
 		return x + y*sizeX;
 	}
+
+	public int getDimensions()
+	{
+		MazePacman maze = game.getMaze();
+		int size = maze.getSizeX() * maze.getSizeY();
+
+		return (int)((game.getNumberOfGhosts()+game.getNumberOfPacmans())*size + Math.pow(size, 2));
+	}
 }

@@ -2,6 +2,8 @@ package agent.rlapproxagent;
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import agent.rlagent.QLearningAgent;
@@ -17,44 +19,54 @@ import environnement.Etat;
  *
  */
 public class QLApproxAgent extends QLearningAgent{
-	
-	public QLApproxAgent(double alpha, double gamma, Environnement _env,FeatureFunction _featurefunction) {
+
+	private FeatureFunction featureFunction;
+	private double[] theta;
+
+	public QLApproxAgent(double alpha, double gamma, Environnement _env, FeatureFunction _featurefunction) {
 		super(alpha, gamma, _env);
-		//*** VOTRE CODE
-		
+
+		this.featureFunction = _featurefunction;
+		theta = new double[featureFunction.getFeatureNb()];
 	}
 
 	
 	@Override
 	public double getQValeur(Etat e, Action a) {
-		//*** VOTRE CODE
-		return 0.0;
+		double[] features = this.featureFunction.getFeatures(e, a);
+		//double qVal = 0.0;
 
+		for (int i = 0; i < featureFunction.getFeatureNb(); i++) {
+			if(features[i] > 0)
+				return features[i]*theta[i];
+		}
+
+		return 0.0;
 	}
-	
-	
-	
-	
+
 	@Override
 	public void endStep(Etat e, Action a, Etat esuivant, double reward) {
 		if (RLAgent.DISPRL){
 			System.out.println("QL: mise a jour poids pour etat \n"+e+" action "+a+" etat' \n"+esuivant+ " r "+reward);
 		}
        //inutile de verifier si e etat absorbant car dans runEpisode et threadepisode 
-		//arrete episode lq etat courant absorbant	
-		
-		//*** VOTRE CODE
-		
-		
+		//arrete episode lq etat courant absorbant
+
+		double[] features = this.featureFunction.getFeatures(e, a);
+
+		for (int i = 0; i < featureFunction.getFeatureNb(); i++) {
+			if(features[i] > 0)
+				theta[i] = theta[i] + alpha * (reward + gamma * this.getValeur(esuivant) - this.getQValeur(e, a)) * features[i];
+		}
 	}
 	
 	@Override
 	public void reset() {
 		super.reset();
 		this.qvaleurs.clear();
-	
-		//*** VOTRE CODE
-		
+
+		this.theta = new double[featureFunction.getFeatureNb()];
+
 		this.episodeNb =0;
 		this.notifyObs();
 	}

@@ -17,24 +17,50 @@ import javafx.util.Pair;
  *
  */
 public class FeatureFunctionIdentity implements FeatureFunction {
-	//*** VOTRE CODE
+
+	private final int nbFeature;
+	private int featureInc;
+	private HashMap<Etat,HashMap<Action,double[]>> featureMap;
 	
 	public FeatureFunctionIdentity(int _nbEtat, int _nbAction){
-		//*** VOTRE CODE
+		this.nbFeature = _nbEtat * _nbAction;
+		featureMap = new HashMap<>();
+		featureInc = 0;
 	}
 	
 	@Override
 	public int getFeatureNb() {
-		//*** VOTRE CODE
-		return 0;
+		return this.nbFeature;
+	}
+
+	private double[] genNewFeature()
+	{
+		double[] newFeature = new double[nbFeature];
+		newFeature[featureInc] = 1;
+		featureInc++;
+		return newFeature;
 	}
 
 	@Override
-	public double[] getFeatures(Etat e,Action a){
-		//*** VOTRE CODE
-		
-		return null;
-	}
-	
+	public double[] getFeatures(Etat e,Action a)
+	{
+		HashMap<Action, double[]> features;
+		if(featureMap.containsKey(e)) {
+			features = featureMap.get(e);
+		}
+		else
+		{
+			features = new HashMap<>();
+			featureMap.put(e, features);
+		}
 
+		if (features.containsKey(a))
+			return features.get(a);
+		else
+		{
+			double[] newFeature = this.genNewFeature();
+			features.put(a, newFeature);
+			return newFeature;
+		}
+	}
 }
