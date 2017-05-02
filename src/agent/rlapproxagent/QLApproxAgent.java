@@ -34,14 +34,14 @@ public class QLApproxAgent extends QLearningAgent{
 	@Override
 	public double getQValeur(Etat e, Action a) {
 		double[] features = this.featureFunction.getFeatures(e, a);
-		//double qVal = 0.0;
+		double qVal = 0.0;
 
 		for (int i = 0; i < featureFunction.getFeatureNb(); i++) {
 			if(features[i] > 0)
-				return features[i]*theta[i];
+				qVal += features[i]*theta[i];
 		}
 
-		return 0.0;
+		return qVal;
 	}
 
 	@Override
@@ -56,7 +56,7 @@ public class QLApproxAgent extends QLearningAgent{
 
 		for (int i = 0; i < featureFunction.getFeatureNb(); i++) {
 			if(features[i] > 0)
-				theta[i] = theta[i] + alpha * (reward + gamma * this.getValeur(esuivant) - this.getQValeur(e, a)) * features[i];
+				theta[i] += alpha * (reward + gamma * this.getValeur(esuivant) - this.getQValeur(e, a)) * features[i];
 		}
 	}
 	
